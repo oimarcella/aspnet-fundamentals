@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <None Remove="Controllers\HomeController.cs~RF140b84f.TMP" />
+    <None Remove="doc.md~RF3c650f.TMP" />
+    <None Remove="doc.md~RF4054c0.TMP" />
     <None Remove="Program.cs~RFb6ad90.TMP" />
     <None Remove="ViewModels\EditorCategoryViewModel.cs~RF40d385.TMP" />
     <None Remove="ViewModels\ResultViewModel.cs~RF62ea05.TMP" />

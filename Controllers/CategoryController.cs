@@ -1,4 +1,5 @@
 ﻿using Blog.Data;
+using Blog.Extensions;
 using Blog.Models;
 using Blog.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -26,9 +27,9 @@ namespace Blog.Controllers
                 var categories = await context.Categories.ToListAsync();
                 return Ok(new ResultViewModel<List<Category>>(categories));
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException err)
             {
-                return StatusCode(500, new ResultViewModel<Category>(ResultViewModel<Category>.StatusCode.InternalServerError));
+                return StatusCode(500, new ResultViewModel<Category>(err.Message));
             }
             catch (Exception)
             {
@@ -49,9 +50,9 @@ namespace Blog.Controllers
 
                 return Ok(new ResultViewModel<Category>(category));
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException err)
             {
-                return StatusCode(500, new ResultViewModel<Category>(ResultViewModel<Category>.StatusCode.InternalServerError));
+                return StatusCode(500, new ResultViewModel<Category>(err.Message));
             }
             catch (Exception)
             {
@@ -65,7 +66,7 @@ namespace Blog.Controllers
             [FromBody] EditorCategoryViewModel model
         )
         {
-            if (!ModelState.IsValid) return BadRequest(new ResultViewModel<Category>(ResultViewModel<Category>.StatusCode.BadRequest));
+            if (!ModelState.IsValid) return BadRequest(new ResultViewModel<Category>(ModelState.GetErrors()));
 
             try
             {
@@ -81,8 +82,8 @@ namespace Blog.Controllers
 
                 return Created($"v1/categories/{newCategory.Id}", new ResultViewModel<Category>(newCategory));
             }
-            catch(DbUpdateException) {
-                return StatusCode(500, new ResultViewModel<Category>(ResultViewModel<Category>.StatusCode.InternalServerError));
+            catch(DbUpdateException err) {
+                return StatusCode(500, new ResultViewModel<Category>(err.Message));
             }
             catch (Exception) {
                 return StatusCode(500, ResultViewModel<Category>.StatusCode.InternalServerError);
@@ -112,9 +113,9 @@ namespace Blog.Controllers
 
                 return Ok(new ResultViewModel<Category>(category));
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException err)
             {
-                return StatusCode(500, new ResultViewModel<Category>(ResultViewModel<Category>.StatusCode.InternalServerError));
+                return StatusCode(500, new ResultViewModel<Category>(err.Message));
             }
             catch (Exception)
             {
@@ -137,9 +138,9 @@ namespace Blog.Controllers
 
                 return Ok(new ResultViewModel<Category>(ResultViewModel<Category>.StatusCode.Ok));
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException err)
             {
-                return StatusCode(500, new ResultViewModel<Category>(ResultViewModel<Category>.StatusCode.InternalServerError));
+                return StatusCode(500, new ResultViewModel<Category>(err.Message));
             }
             catch (Exception)
             {

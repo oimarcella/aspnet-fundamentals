@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Controllers\AccountController.cs~RF20a77b5.TMP" />
+    <None Remove="Controllers\AccountController.cs~RF20bcf85.TMP" />
     <None Remove="Controllers\HomeController.cs~RF140b84f.TMP" />
     <None Remove="doc.md~RF3c650f.TMP" />
     <None Remove="doc.md~RF4054c0.TMP" />

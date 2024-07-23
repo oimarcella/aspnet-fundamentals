@@ -13,11 +13,14 @@
     <None Remove="Extensions\ModelStateExtension.cs~RF129ec8.TMP" />
     <None Remove="Extensions\ModelStateExtension.cs~RF2a21b4.TMP" />
     <None Remove="Program.cs~RFb6ad90.TMP" />
+    <None Remove="Services\TokenService.cs~RF2fd57b.TMP" />
     <None Remove="ViewModels\EditorCategoryViewModel.cs~RF40d385.TMP" />
     <None Remove="ViewModels\ResultViewModel.cs~RF62ea05.TMP" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

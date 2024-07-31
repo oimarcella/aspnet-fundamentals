@@ -1,5 +1,4 @@
-﻿using Azure.Messaging;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Blog.ViewModels
 {
@@ -23,21 +22,31 @@ namespace Blog.ViewModels
             Errors.Add(error);
         }
 
+        public ResultViewModel(string data, bool isError = true)
+        {
+            if (!isError)
+            {
+                Data = (T)(object)data;
+                Errors = new List<string>();
+            }
+        }
+
+        //ResultViewModel<T>.StatusCode.InternalServerError
         public ResultViewModel(StatusCode status)
         {
-            if(status == StatusCode.Ok)
+            if (status == StatusCode.Ok)
             {
-                Message = GetDefaultErrorMessage(status);
+                Message = GetDefaultMessage(status);
             }
             else
             {
-                Errors.Add(GetDefaultErrorMessage(status));
+                Errors.Add(GetDefaultMessage(status));
             }
         }
 
         public T Data { get; private set; }
         public List<string> Errors { get; private set; } = new();
-        public string Message {get; private set;}
+        public string Message { get; private set; }
 
         public enum StatusCode
         {
@@ -49,7 +58,7 @@ namespace Blog.ViewModels
             InternalServerError = 500
         }
 
-        private string GetDefaultErrorMessage(StatusCode status)
+        private string GetDefaultMessage(StatusCode status)
         {
             return status switch
             {

@@ -14,6 +14,7 @@
     <None Remove="doc.md~RF4054c0.TMP" />
     <None Remove="Extensions\ModelStateExtension.cs~RF129ec8.TMP" />
     <None Remove="Extensions\ModelStateExtension.cs~RF2a21b4.TMP" />
+    <None Remove="Extensions\RoleClaimsExtension.cs~RFb19c33.TMP" />
     <None Remove="Program.cs~RFb6ad90.TMP" />
     <None Remove="Services\TokenService.cs~RF2fd57b.TMP" />
     <None Remove="ViewModels\EditorCategoryViewModel.cs~RF40d385.TMP" />
@@ -28,6 +29,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.6" />
+    <PackageReference Include="SecureIdentity" Version="1.0.4" />
   </ItemGroup>
 
 </Project>

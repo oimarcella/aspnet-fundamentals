@@ -4,6 +4,7 @@ using Blog.Data;
 using Blog.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
@@ -34,6 +35,13 @@ builder.Services.AddTransient<TokenService>();
 
 var app = builder.Build();
 
-app.MapControllers();
+// Passando informacoes o appsettings para as propriedades da classe Configuration
+Configuration.JwtKey = app.Configuration.GetValue<string>("JwtKey");
+Configuration.ApiKeyName = app.Configuration.GetValue<string>("ApiKeyName");
+Configuration.ApiKeyValue = app.Configuration.GetValue<string>("ApiKeyValue");
+var smtp = new Configuration.SmtpConfiguration();
+app.Configuration.GetSection("Smtp").Bind(smtp);
+Configuration.Smtp = smtp;
 
+app.MapControllers();
 app.Run();

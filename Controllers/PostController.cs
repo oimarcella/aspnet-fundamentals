@@ -1,6 +1,9 @@
+using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Blog.Data;
+using Blog.Models;
 using Blog.ViewModels;
 using Blog.ViewModels.Posts;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +18,7 @@ public class PostController : ControllerBase
     public async Task<IActionResult> GetAsync(
         [FromServices] BlogDataContext context,
         [FromQuery] int page = 0,
-        [FromQuery] int pageSize = 0
+        [FromQuery] int pageSize = 10
     )
     {
         try
@@ -46,6 +49,30 @@ public class PostController : ControllerBase
                 pageSize,
                 posts
             }));
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<dynamic>(ResultViewModel<string>.StatusCode.InternalServerError));
+        }
+    }
+
+    [HttpGet("v1/posts/{id:int}")]
+    public async Task<IActionResult> DetailsAsync(
+        [FromServices] BlogDataContext context,
+        [FromRoute] int id
+    )
+    {
+        try
+        {
+            var post = await context
+            .Posts
+            .AsNoTracking()
+            .Include(x => x.Author)
+            .ThenInclude(c => c.Roles) //roles do author
+            .Include(x => x.Category)
+            .FirstOrDefaultAsync(x => x.Id == id);
+            if (post == null) return StatusCode(204, new ResultViewModel<Post>("Nada encontrado na busca", isError: false));
+            return Ok(new ResultViewModel<Post>(post));
         }
         catch
         {

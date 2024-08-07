@@ -33,6 +33,7 @@ void LoadConfiguration(WebApplication app)
 }
 void ConfigureAuthentication(WebApplicationBuilder builder)
 {
+    // Usando a chave jwt para encriptar e desencriptar token
     var key = Encoding.ASCII.GetBytes(Configuration.JwtKey);
     builder.Services.AddAuthentication(x =>
     {

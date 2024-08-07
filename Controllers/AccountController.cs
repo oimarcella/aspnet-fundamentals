@@ -3,11 +3,13 @@ using Blog.Extensions;
 using Blog.Models;
 using Blog.Services;
 using Blog.ViewModels;
+using Blog.ViewModels.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SecureIdentity.Password;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Blog.Controllers;
@@ -19,7 +21,7 @@ public class AccountController : ControllerBase
         [FromServices] BlogDataContext context
     )
     {
-        if(!ModelState.IsValid) return BadRequest(new ResultViewModel<string>(ResultViewModel<string>.StatusCode.BadRequest));
+        if (!ModelState.IsValid) return BadRequest(new ResultViewModel<string>(ResultViewModel<string>.StatusCode.BadRequest));
         var user = new User
         {
             Name = model.Name,
@@ -44,12 +46,13 @@ public class AccountController : ControllerBase
             // Retorne o resultado
             return Ok(new ResultViewModel<dynamic>(response));
         }
-        catch(DbUpdateException error)
+        catch (DbUpdateException error)
         {
             Console.WriteLine(error);
-            return StatusCode( 400, new ResultViewModel<dynamic>("E-mail já existe"));
+            return StatusCode(400, new ResultViewModel<dynamic>("E-mail já existe"));
         }
-        catch {
+        catch
+        {
             return StatusCode(500, new ResultViewModel<dynamic>(
              ResultViewModel<dynamic>.StatusCode.InternalServerError
             ));
@@ -75,7 +78,7 @@ public class AccountController : ControllerBase
             return StatusCode(401, new ResultViewModel<dynamic>("E-mail ou senha inválidos"));
 
         try
-        {           
+        {
             var token = tokenService.GenerateToken(user);
             return Ok(new ResultViewModel<string>(token, errors: null));
         }
@@ -90,5 +93,48 @@ public class AccountController : ControllerBase
              ResultViewModel<dynamic>.StatusCode.InternalServerError
             ));
         }
+    }
+
+
+    [Authorize]
+    [HttpPost("v1/accounts/upload-image")]
+    public async Task<IActionResult> UploadImage(
+        [FromBody] UploadImageViewModel model,
+        [FromServices] BlogDataContext context
+    )
+    {
+        var filename = $"{Guid.NewGuid()}.jpg";
+        var data = new Regex(@"^data:image\/[a-z]+;base64,").Replace(model.Base64Image, "");
+        var bytes = Convert.FromBase64String(data);
+
+        try
+        {
+            await System.IO.File.WriteAllBytesAsync($"wwwroot/images/{filename}", bytes);
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<dynamic>(ResultViewModel<dynamic>.StatusCode.InternalServerError));
+        }
+
+        var user = await context
+        .Users
+        .FirstOrDefaultAsync(x => x.Email == User.Identity.Name);
+
+        if (user == null)
+            return NotFound(new ResultViewModel<dynamic>("Usuário não enconrado"));
+
+        user.Image = $"https://localhost:0000/images/{filename}";
+
+        try
+        {
+            context.Users.Update(user);
+            await context.SaveChangesAsync();
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<dynamic>(ResultViewModel<dynamic>.StatusCode.InternalServerError));
+        }
+
+        return Ok(new ResultViewModel<dynamic>(new { user.Image }));
     }
 }

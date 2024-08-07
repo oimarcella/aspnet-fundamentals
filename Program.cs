@@ -12,8 +12,12 @@ var builder = WebApplication.CreateBuilder(args);
 ConfigureAuthentication(builder);
 ConfigureMvc(builder);
 ConfigureServices(builder);
+
 var app = builder.Build();
 LoadConfiguration(app);
+app.UseAuthentication();//autenticação primeiro que autorização
+app.UseAuthorization();
+app.UseStaticFiles(); //para renderizar imagens, js e css, vai procurar em wwwroot
 app.MapControllers();
 app.Run();
 

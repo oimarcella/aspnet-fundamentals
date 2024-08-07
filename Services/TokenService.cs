@@ -24,7 +24,7 @@ public class TokenService
             SigningCredentials = new SigningCredentials(
                 new SymmetricSecurityKey(key),
                 SecurityAlgorithms.HmacSha256Signature),
-            Subject = new ClaimsIdentity(claims)
+            Subject = new ClaimsIdentity(claims) 
         };
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);

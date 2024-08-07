@@ -1,15 +1,15 @@
-﻿using Blog.Attributes;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.Controllers
 {
     [ApiController]
     [Route("")]
-    public class HomeController:ControllerBase
+    public class HomeController : ControllerBase
     {
         [HttpGet("")]
-        public IActionResult Get (){
-            return Ok(new {message = "Estou vivo! 🤖"});
+        public IActionResult Get()
+        {
+            return Ok(new { message = "Estou vivo! 🤖" });
         }
     }
 }

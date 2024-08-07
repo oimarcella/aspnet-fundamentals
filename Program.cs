@@ -1,4 +1,6 @@
+using System.Security.Cryptography.Xml;
 using System.Text;
+using System.Text.Json.Serialization;
 using Blog;
 using Blog.Data;
 using Blog.Services;
@@ -27,6 +29,8 @@ void LoadConfiguration(WebApplication app)
     Configuration.JwtKey = app.Configuration.GetValue<string>("JwtKey");
     Configuration.ApiKeyName = app.Configuration.GetValue<string>("ApiKeyName");
     Configuration.ApiKeyValue = app.Configuration.GetValue<string>("ApiKeyValue");
+    Configuration.AppPort = app.Configuration.GetValue<int>("AppPort");
+
     var smtp = new Configuration.SmtpConfiguration();
     app.Configuration.GetSection("Smtp").Bind(smtp);
     Configuration.Smtp = smtp;
@@ -54,7 +58,13 @@ void ConfigureMvc(WebApplicationBuilder builder)
 {
     builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
     {
-        options.SuppressModelStateInvalidFilter = true; /*Remover valida��o autom�tica do payload da requisi��o*/
+        options.SuppressModelStateInvalidFilter = true; /*Remover validacao automatica do payload da requisicao*/
+    })
+    //Resolvendo problemas de serialização, ciclos subsequentes, vai até primeiro nó
+    .AddJsonOptions(x =>
+    {
+        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;//objetos que estiverem como null serão ignorados
     });
 }
 void ConfigureServices(WebApplicationBuilder builder)

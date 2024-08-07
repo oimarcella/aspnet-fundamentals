@@ -123,7 +123,7 @@ public class AccountController : ControllerBase
         if (user == null)
             return NotFound(new ResultViewModel<dynamic>("Usuário não enconrado"));
 
-        user.Image = $"https://localhost:0000/images/{filename}";
+        user.Image = $"http://localhost:{Configuration.AppPort}/images/{filename}";
 
         try
         {

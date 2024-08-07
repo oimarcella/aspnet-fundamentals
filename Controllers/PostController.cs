@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -73,6 +74,50 @@ public class PostController : ControllerBase
             .FirstOrDefaultAsync(x => x.Id == id);
             if (post == null) return StatusCode(204, new ResultViewModel<Post>("Nada encontrado na busca", isError: false));
             return Ok(new ResultViewModel<Post>(post));
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<dynamic>(ResultViewModel<string>.StatusCode.InternalServerError));
+        }
+    }
+
+    [HttpGet("v1/posts/category/{category}")]
+    public async Task<IActionResult> GetByCategoryAsync(
+        [FromServices] BlogDataContext context,
+        [FromRoute] string category,
+        [FromQuery] int page,
+        [FromQuery] int pageSize = 10
+        )
+    {
+        try
+        {
+            var count = await context.Posts.AsNoTracking().CountAsync();
+            var posts = await context.Posts
+            .AsNoTracking()
+            .Include(x => x.Author)
+            .Include(x => x.Category)
+            .Where(x => x.Category.Slug == category)
+            .Select(x => new ListPostsViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Slug = x.Slug,
+                LastUpdateDate = x.LastUpdateDate,
+                Category = x.Category.Name,
+                Author = $"{x.Author} ({x.Author.Email})"
+            })
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .OrderByDescending(x => x.LastUpdateDate)
+            .ToListAsync();
+
+            return Ok(new ResultViewModel<dynamic>(new
+            {
+                total = count,
+                page,
+                pageSize,
+                posts
+            }));
         }
         catch
         {

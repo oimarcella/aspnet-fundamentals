@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Blog.Data;
+using Blog.ViewModels;
 using Blog.ViewModels.Posts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,22 +18,38 @@ public class PostController : ControllerBase
         [FromQuery] int pageSize = 0
     )
     {
-        var posts = await context.Posts
-        .Include(c => c.Category)
-        .Include(x => x.Author)
-        .Select(x => new ListPostsViewModel
+        try
         {
-            Id = x.Id,
-            Title = x.Title,
-            Slug = x.Slug,
-            LastUpdateDate = x.LastUpdateDate,
-            Category = x.Category.Name,
-            Author = $"{x.Author.Name} ({x.Author.Email})"
-        })
-        .Skip(page * pageSize)
-        .Take(pageSize)
-        .ToArrayAsync();
+            var count = await context.Posts.AsNoTracking().CountAsync();
+            var posts = await context.Posts
+            .AsNoTracking()
+            .Include(c => c.Category)
+            .Include(x => x.Author)
+            .Select(x => new ListPostsViewModel
+            {
+                Id = x.Id,
+                Title = x.Title,
+                Slug = x.Slug,
+                LastUpdateDate = x.LastUpdateDate,
+                Category = x.Category.Name,
+                Author = $"{x.Author.Name} ({x.Author.Email})"
+            })
+            .OrderByDescending(x => x.LastUpdateDate)
+            .Skip(page * pageSize)
+            .Take(pageSize)
+            .ToArrayAsync();
 
-        return Ok(posts);
+            return Ok(new ResultViewModel<dynamic>(new
+            {
+                total = count,
+                page,
+                pageSize,
+                posts
+            }));
+        }
+        catch
+        {
+            return StatusCode(500, new ResultViewModel<dynamic>(ResultViewModel<string>.StatusCode.InternalServerError));
+        }
     }
 }

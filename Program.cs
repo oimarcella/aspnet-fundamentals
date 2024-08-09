@@ -1,3 +1,4 @@
+using System;
 using System.IO.Compression;
 using System.Security.Cryptography.Xml;
 using System.Text;
@@ -11,12 +12,17 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureAuthentication(builder);
 ConfigureMvc(builder);
 ConfigureServices(builder);
+
+//Documentacao com Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 LoadConfiguration(app);
@@ -26,6 +32,13 @@ app.UseAuthorization();
 app.MapControllers();
 app.UseStaticFiles(); //para renderizar imagens, js e css, vai procurar em wwwroot
 app.UseResponseCompression();
+
+if (app.Environment.IsDevelopment())
+{
+    Console.WriteLine("Ambiente: Dev");
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 app.Run();
 
 void LoadConfiguration(WebApplication app)

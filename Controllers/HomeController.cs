@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace Blog.Controllers
 {
@@ -7,9 +8,10 @@ namespace Blog.Controllers
     public class HomeController : ControllerBase
     {
         [HttpGet("")]
-        public IActionResult Get()
+        public IActionResult Get([FromServices] IConfiguration config)
         {
-            return Ok(new { message = "Estou vivo! 🤖" });
+            var environment = config.GetValue<string>("Env");
+            return Ok(new { message = "Estou vivo! 🤖", environment });
         }
     }
 }

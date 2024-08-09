@@ -8,6 +8,7 @@ using Blog.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -19,11 +20,12 @@ ConfigureServices(builder);
 
 var app = builder.Build();
 LoadConfiguration(app);
+app.UseHttpsRedirection();
 app.UseAuthentication();//autenticação primeiro que autorização
 app.UseAuthorization();
-app.UseResponseCompression();
-app.UseStaticFiles(); //para renderizar imagens, js e css, vai procurar em wwwroot
 app.MapControllers();
+app.UseStaticFiles(); //para renderizar imagens, js e css, vai procurar em wwwroot
+app.UseResponseCompression();
 app.Run();
 
 void LoadConfiguration(WebApplication app)
@@ -72,7 +74,8 @@ void ConfigureMvc(WebApplicationBuilder builder)
 }
 void ConfigureServices(WebApplicationBuilder builder)
 {
-    builder.Services.AddDbContext<BlogDataContext>();
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    builder.Services.AddDbContext<BlogDataContext>(options => options.UseSqlServer(connectionString));
     builder.Services.AddTransient<TokenService>();
     builder.Services.AddMemoryCache();
     builder.Services.AddResponseCompression(opt =>

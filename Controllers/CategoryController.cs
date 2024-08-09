@@ -34,7 +34,6 @@ namespace Blog.Controllers
                     entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
                     return context.Categories.ToList();
                 });
-                var categories2 = await context.Categories.ToListAsync();
                 return Ok(new ResultViewModel<List<Category>>(categories));
             }
             catch (DbUpdateException err)
